@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX_STACK_SIZE 100
+
+typedef struct Stack {
+    int top;
+    char items[MAX_STACK_SIZE];
+} Stack;
+
+void push(Stack* stack, char c) {
+    if (stack->top == MAX_STACK_SIZE - 1) {
+        printf("Stack overflow!\n");
+        exit(1);
+    }
+    stack->items[++stack->top] = c;
+}
+
+char pop(Stack* stack) {
+    if (stack->top == -1) {
+        printf("Stack underflow!\n");
+        exit(1);
+    }
+    return stack->items[stack->top--];
+}
+
+char peek(Stack* stack) {
+    if (stack->top == -1) {
+        printf("Stack underflow!\n");
+        exit(1);
+    }
+    return stack->items[stack->top];
+}
+
+int is_operator(char c) {
+    return c == '+' || c == '-' || c == '*' || c == '/';
+}
+
+int precedence(char c) {
+    if (c == '*' || c == '/')
+        return 2;
+    else if (c == '+' || c == '-')
+        return 1;
+    else
+        return 0;
+}
+
+int main() {
+    Stack stack;
+    stack.top = -1;
+    char expression[MAX_STACK_SIZE];
+    printf("Enter an infix notation: ");
+    fgets(expression, MAX_STACK_SIZE, stdin);
+    printf("Postfix notation: ");
+    for (int i = 0; i < strlen(expression); i++) {
+        char c = expression[i];
+        if (isalnum(c))
+            printf("%c", c);
+        else if (c == '(')
+            push(&stack, c);
+        else if (c == ')') {
+            while (peek(&stack) != '(')
+                printf("%c", pop(&stack));
+            pop(&stack);
+        } else if (is_operator(c)) {
+            while (precedence(c) <= precedence(peek(&stack)))
+                printf("%c", pop(&stack));
+            push(&stack, c);
+        }
+    }
+    while (stack.top != -1)
+        printf("%c", pop(&stack));
+    printf("\n");
+    return 0;
+}
+
+OUTPUT:
+Enter an infix notation: saranya
+Postfix notation: saranya
+
+--------------------------------
+Process exited after 5.469 seconds with return value 0
+Press any key to continue . . .
